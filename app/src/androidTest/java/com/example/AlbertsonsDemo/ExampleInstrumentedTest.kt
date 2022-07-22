@@ -1,4 +1,4 @@
-package com.example.acronimeExample
+package com.example.AlbertsonsDemo
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

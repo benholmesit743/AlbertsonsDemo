@@ -1,4 +1,4 @@
-package com.example.acronimeExample
+package com.example.AlbertsonsDemo
 
 import retrofit2.Response
 import retrofit2.http.GET

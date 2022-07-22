@@ -1,4 +1,4 @@
-package com.example.acronimeExample
+package com.example.AlbertsonsDemo
 
 import org.junit.Test
 
