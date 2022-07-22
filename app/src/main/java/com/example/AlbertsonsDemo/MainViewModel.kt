@@ -9,12 +9,15 @@ import kotlinx.coroutines.launch
 
 class MainViewModel: ViewModel() {
 
-    val _sfLiveData = MutableLiveData<List<AcronimesSF>>()
-    val SFLiveData: LiveData<List<AcronimesSF>> = _sfLiveData
+    val retrofit = RetrofitClient.getInstance()
+    val apiInterface = retrofit.create(ApiInterface::class.java)
 
-    fun searchText(text: String) {
-        var retrofit = RetrofitClient.getInstance()
-        var apiInterface = retrofit.create(ApiInterface::class.java)
+    val _sfLiveData = MutableLiveData<List<AcromineSF>>()
+    val SFLiveData: LiveData<List<AcromineSF>> = _sfLiveData
+
+    fun searchText(text: String?) {
+        if (text == null) return
+
         viewModelScope.launch {
             try {
                 val response = apiInterface.getShortForms("HMM")

@@ -7,5 +7,5 @@ import retrofit2.http.Query
 
 interface ApiInterface {
     @GET("software/acromine/dictionary.py")
-    suspend fun getShortForms(@Query("sf") shortForm: String): Response<List<AcronimesSF>>
+    suspend fun getShortForms(@Query("sf") shortForm: String): Response<List<AcromineSF>>
 }

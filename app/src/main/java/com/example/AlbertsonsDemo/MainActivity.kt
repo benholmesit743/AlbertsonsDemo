@@ -13,10 +13,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -44,12 +42,6 @@ class MainActivity : ComponentActivity() {
 
         viewModel = MainViewModel()
 
-        viewModel.SFLiveData.observe(this) {
-            for (i in it) {
-                Log.i("Log", i.toString())
-            }
-        }
-
         setContent {
             Scaffold(
                 topBar = { TopBar() },
@@ -76,9 +68,13 @@ fun Navigation(viewModel: MainViewModel) {
 fun MainScreen(navController: NavController, viewModel: MainViewModel) {
     val textState = remember { mutableStateOf(TextFieldValue("")) }
     viewModel.searchText(textState.value.toString())
+    val originalList by viewModel.SFLiveData.observeAsState()
+    if (originalList != null) {
+        Log.i("list", originalList.toString())
+    }
     Column {
         SearchView(textState)
-        SearchList(navController = navController, state = textState, viewModel)
+        SearchList(navController = navController, textState, originalList)
     }
 }
 
@@ -149,28 +145,30 @@ fun SearchViewPreview() {
 }
 
 @Composable
-fun SearchList(navController: NavController, state: MutableState<TextFieldValue>, viewModel: MainViewModel) {
+fun SearchList(navController: NavController, state: MutableState<TextFieldValue>, passedList: List<AcromineSF>?) {
 //    val countries = getListOfCountries()
-    val countries = ArrayList<String>(emptyList())
-    var filteredCountries: ArrayList<String>
+
+    var originalList = ArrayList<AcromineSF>(emptyList())
+    if (passedList != null) originalList = ArrayList(passedList)
+    var filteredCountries: ArrayList<AcromineSF>
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         val searchedText = state.value.text
         filteredCountries = if (searchedText.isEmpty()) {
-            countries
+            originalList
         } else {
-            val resultList = ArrayList<String>()
-            for (country in countries) {
-                if (country.lowercase(Locale.getDefault())
-                        .contains(searchedText.lowercase(Locale.getDefault()))
-                ) {
-                    resultList.add(country)
-                }
-            }
+            val resultList = ArrayList<AcromineSF>()
+//            for (country in originalList) {
+//                if (country.lowercase(Locale.getDefault())
+//                        .contains(searchedText.lowercase(Locale.getDefault()))
+//                ) {
+//                    resultList.add(country)
+//                }
+//            }
             resultList
         }
         items(filteredCountries) { filteredCountry ->
             SearchListItem(
-                text = filteredCountry,
+                text = filteredCountry.sf,
                 onItemClick = { selectedCountry ->
                     navController.navigate("details/$selectedCountry") {
                         // Pop up to the start destination of the graph to
@@ -196,7 +194,7 @@ fun SearchList(navController: NavController, state: MutableState<TextFieldValue>
 fun SearchListPreview() {
     val navController = rememberNavController()
     val textState = remember { mutableStateOf(TextFieldValue("")) }
-    SearchList(navController = navController, state = textState, MainViewModel())
+    SearchList(navController = navController, state = textState, ArrayList<AcromineSF>(emptyList()))
 }
 
 @Composable

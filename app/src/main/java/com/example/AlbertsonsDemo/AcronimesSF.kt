@@ -2,14 +2,14 @@ package com.example.AlbertsonsDemo
 
 import com.google.gson.annotations.SerializedName
 
-data class AcronimesSF(
+data class AcromineSF(
     @SerializedName("sf")
     val sf: String,
     @SerializedName("lfs")
-    val lfs: List<AcronimesLF>
+    val lfs: List<AcromineLF>
 )
 
-data class AcronimesLF(
+data class AcromineLF(
     @SerializedName("lf")
     val lf: String,
     @SerializedName("freq")
