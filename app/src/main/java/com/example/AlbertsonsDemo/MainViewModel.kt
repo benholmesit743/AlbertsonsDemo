@@ -20,7 +20,7 @@ class MainViewModel: ViewModel() {
 
         viewModelScope.launch {
             try {
-                val response = apiInterface.getShortForms("HMM")
+                val response = apiInterface.getShortForms(text)
                 if (response.isSuccessful()) {
 
                     val result = response?.body()

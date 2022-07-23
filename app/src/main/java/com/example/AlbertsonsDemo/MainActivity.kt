@@ -66,12 +66,12 @@ fun Navigation(viewModel: MainViewModel) {
 
 @Composable
 fun MainScreen(navController: NavController, viewModel: MainViewModel) {
-    val textState = remember { mutableStateOf(TextFieldValue("")) }
-    viewModel.searchText(textState.value.toString())
+    val textState = remember { mutableStateOf(TextFieldValue("HMM")) }
+    val textString = textState.value.text
+    viewModel.searchText(textString)
+
     val originalList by viewModel.SFLiveData.observeAsState()
-    if (originalList != null) {
-        Log.i("list", originalList.toString())
-    }
+
     Column {
         SearchView(textState)
         SearchList(navController = navController, textState, originalList)
@@ -94,7 +94,7 @@ fun SearchView(state: MutableState<TextFieldValue>) {
         },
         modifier = Modifier
             .fillMaxWidth(),
-        textStyle = TextStyle(color = colorResource(id = R.color.colorPrimary), fontSize = 18.sp),
+        textStyle = TextStyle(color = Color.White, fontSize = 18.sp),
         leadingIcon = {
             Icon(
                 Icons.Default.Search,
@@ -146,43 +146,31 @@ fun SearchViewPreview() {
 
 @Composable
 fun SearchList(navController: NavController, state: MutableState<TextFieldValue>, passedList: List<AcromineSF>?) {
-//    val countries = getListOfCountries()
-
     var originalList = ArrayList<AcromineSF>(emptyList())
     if (passedList != null) originalList = ArrayList(passedList)
-    var filteredCountries: ArrayList<AcromineSF>
+    var filteredList: ArrayList<String>
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         val searchedText = state.value.text
-        filteredCountries = if (searchedText.isEmpty()) {
-            originalList
+        filteredList = if (searchedText.isEmpty()) {
+            ArrayList(emptyList())
         } else {
-            val resultList = ArrayList<AcromineSF>()
-//            for (country in originalList) {
-//                if (country.lowercase(Locale.getDefault())
-//                        .contains(searchedText.lowercase(Locale.getDefault()))
-//                ) {
-//                    resultList.add(country)
-//                }
-//            }
+            val resultList = ArrayList<String>()
+            for (item in originalList) {
+                for (abbrv in item.lfs) {
+                    if (abbrv.lf.lowercase(Locale.getDefault())
+                            .contains(searchedText.lowercase(Locale.getDefault()))
+                    ) {
+                        resultList.add(abbrv.lf)
+                    }
+                }
+            }
             resultList
         }
-        items(filteredCountries) { filteredCountry ->
+        items(filteredList) { item ->
             SearchListItem(
-                text = filteredCountry.sf,
-                onItemClick = { selectedCountry ->
-                    navController.navigate("details/$selectedCountry") {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
-                        popUpTo("main") {
-                            saveState = true
-                        }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                    }
+                text = item,
+                onItemClick = { selectedItem ->
+                    //Do Nothing
                 }
             )
         }
