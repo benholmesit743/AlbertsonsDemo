@@ -21,9 +21,9 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 val response = apiInterface.getShortForms(text)
-                if (response.isSuccessful()) {
+                if (response.isSuccessful) {
 
-                    val result = response?.body()
+                    val result = response.body()
                     if (result != null) {
                         Log.i("Body", response.body().toString())
                         _sfLiveData.value = result

@@ -1,7 +1,6 @@
 package com.example.AlbertsonsDemo
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -25,12 +24,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class MainActivity : ComponentActivity() {
@@ -47,42 +41,28 @@ class MainActivity : ComponentActivity() {
                 topBar = { TopBar() },
                 backgroundColor = colorResource(id = R.color.colorPrimary)
             ) {
-                Navigation(viewModel)
+                MainScreen(viewModel)
             }
         }
     }
 }
 
-
 @Composable
-fun Navigation(viewModel: MainViewModel) {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "main") {
-        composable("main") {
-            MainScreen(navController = navController, viewModel)
-        }
-    }
-}
-
-@Composable
-fun MainScreen(navController: NavController, viewModel: MainViewModel) {
-    val textState = remember { mutableStateOf(TextFieldValue("HMM")) }
+fun MainScreen(viewModel: MainViewModel) {
+    val textState = remember { mutableStateOf(TextFieldValue("")) }
     val textString = textState.value.text
-    viewModel.searchText(textString)
-
-    val originalList by viewModel.SFLiveData.observeAsState()
+    if (!textString.isEmpty()) viewModel.searchText(textString)
 
     Column {
         SearchView(textState)
-        SearchList(navController = navController, textState, originalList)
+        SearchList(viewModel)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    val navController = rememberNavController()
-    MainScreen(navController = navController, MainViewModel())
+    MainScreen(MainViewModel())
 }
 
 @Composable
@@ -145,30 +125,14 @@ fun SearchViewPreview() {
 }
 
 @Composable
-fun SearchList(navController: NavController, state: MutableState<TextFieldValue>, passedList: List<AcromineSF>?) {
-    var originalList = ArrayList<AcromineSF>(emptyList())
-    if (passedList != null) originalList = ArrayList(passedList)
-    var filteredList: ArrayList<String>
+fun SearchList(viewModel: MainViewModel) {
+    val originalList by viewModel.SFLiveData.observeAsState()
+    if (originalList.isNullOrEmpty()) return
+
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        val searchedText = state.value.text
-        filteredList = if (searchedText.isEmpty()) {
-            ArrayList(emptyList())
-        } else {
-            val resultList = ArrayList<String>()
-            for (item in originalList) {
-                for (abbrv in item.lfs) {
-                    if (abbrv.lf.lowercase(Locale.getDefault())
-                            .contains(searchedText.lowercase(Locale.getDefault()))
-                    ) {
-                        resultList.add(abbrv.lf)
-                    }
-                }
-            }
-            resultList
-        }
-        items(filteredList) { item ->
+        items(originalList!!.first().lfs ?: emptyList()) { item ->
             SearchListItem(
-                text = item,
+                text = item.lf ?: "No Results",
                 onItemClick = { selectedItem ->
                     //Do Nothing
                 }
@@ -180,9 +144,7 @@ fun SearchList(navController: NavController, state: MutableState<TextFieldValue>
 @Preview(showBackground = true)
 @Composable
 fun SearchListPreview() {
-    val navController = rememberNavController()
-    val textState = remember { mutableStateOf(TextFieldValue("")) }
-    SearchList(navController = navController, state = textState, ArrayList<AcromineSF>(emptyList()))
+    SearchList(MainViewModel())
 }
 
 @Composable
