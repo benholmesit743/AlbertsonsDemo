@@ -127,16 +127,17 @@ fun SearchViewPreview() {
 @Composable
 fun SearchList(viewModel: MainViewModel) {
     val originalList by viewModel.SFLiveData.observeAsState()
-    if (originalList.isNullOrEmpty()) return
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        items(originalList!!.first().lfs ?: emptyList()) { item ->
-            SearchListItem(
-                text = item.lf ?: "No Results",
-                onItemClick = { selectedItem ->
-                    //Do Nothing
-                }
-            )
+        if (!originalList.isNullOrEmpty()) {
+            items(originalList!!.first().lfs) { item ->
+                SearchListItem(
+                    text = item.lf,
+                    onItemClick = { selectedItem ->
+                        //Do Nothing
+                    }
+                )
+            }
         }
     }
 }

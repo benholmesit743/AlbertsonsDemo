@@ -30,6 +30,7 @@ class MainViewModel: ViewModel() {
                     }
                 } else {
                     Log.e("Error", response.errorBody().toString())
+                    _sfLiveData.value = emptyList()
                 }
             }catch (Ex:Exception){
                 Log.e("Error",Ex.localizedMessage)
