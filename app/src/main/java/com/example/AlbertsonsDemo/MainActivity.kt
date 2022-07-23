@@ -24,7 +24,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 
 
 class MainActivity : ComponentActivity() {
